@@ -1,0 +1,30 @@
+PiGameSharp
+===========
+
+I make a game for my children each year. Sofar it's been hack'n'slash by
+writing to /dev/fb0, reading from /dev/js0 etc. It's time to up the performance
+and cut down on the development cycle so I need a framework. I'm not an artist,
+so to make my life simple (and my projects managable) I've decided to aim for
+2D graphics. Pixel art preferably. Think Zelda, A link to the past, NES/SNES,
+Day of the Tentacle, Mario and Starcraft, to name a few examples. I loved these
+as a kid and I love making stuff. So why not make them for my kids. (Ok so my
+art skills can make the best game look bad, but some things you just gotta
+ignore. ^_^)
+
+So for the technical side, I am very comfortable with C#. So I went looking for
+a library that I liked that would allow me to do this from C#. But I found
+mostly general 3D graphics libs that are too heavy for the PI, some others
+targeting GLES, and wrappers around wrappers using some obscure lib. Did I
+mention I wanted to stick to 2D, not 3D? Sure I can fake 2D graphics by using
+textured quads, but the Pi also supports far more advanced 2D graphics through
+OpenVG. There is little to no support for this framework on... any platform
+really. (Do other developers know something that I don't when they decide not
+to use OpenVG? Or is just everything 3D these days?) So I decided to do a quick
+lib that would let me build the this year's game and get me in a good position
+for next year. After dealing with DispManX, EGL and OpenVG I thought I might
+aswell include evdev input and Alsa audio for a neat package.
+
+
+This lib is made to use the Khronos Reference Implementation of OpenVG or the
+Broadcom OpenVG implementation on the Raspbery Pi. The RI gives a slow software
+render on a development platform.

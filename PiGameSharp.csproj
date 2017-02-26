@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0ABCEE82-3CF0-438B-87C3-197F417D5226}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PiGameSharp</RootNamespace>
+    <AssemblyName>PiGameSharp</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;WINDOWS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Handle.cs" />
+    <Compile Include="Dispmanx\DisplayDevice.cs" />
+    <Compile Include="Dispmanx\ModeInfo.cs" />
+    <Compile Include="Dispmanx\BcmHost.cs" />
+    <Compile Include="Dispmanx\InputFormat.cs" />
+    <Compile Include="EGL\EGL.cs" />
+    <Compile Include="EGL\EglApi.cs" />
+    <Compile Include="EGL\EglDispmanxWindow.cs" />
+    <Compile Include="EGL\EglError.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rect.cs" />
+    <Compile Include="Dispmanx\Transform.cs" />
+    <Compile Include="Vector2.cs" />
+    <Compile Include="VG\BlendMode.cs" />
+    <Compile Include="VG\ErrorCode.cs" />
+    <Compile Include="VG\Image.cs" />
+    <Compile Include="VG\ImageFormat.cs" />
+    <Compile Include="VG\ImageRenderQuality.cs" />
+    <Compile Include="VG\Matrix.cs" />
+    <Compile Include="VG\MatrixMode.cs" />
+    <Compile Include="VG\Parameter.cs" />
+    <Compile Include="VG\ParameterInfoAttribute.cs" />
+    <Compile Include="VG\RenderGraph.cs" />
+    <Compile Include="VG\Vector3.cs" />
+    <Compile Include="VG\VG.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="libOpenVG.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
