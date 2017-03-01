@@ -1,6 +1,6 @@
 ﻿namespace PiGameSharp.VG
 {
-	public enum ErrorCode : uint
+	internal enum ErrorCode : uint
 	{
 		NoError = 0,
 		BadHandle = 0x1000,

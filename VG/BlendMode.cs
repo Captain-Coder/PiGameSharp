@@ -1,5 +1,8 @@
 ﻿namespace PiGameSharp.VG
 {
+	/// <summary>
+	/// OpenVG blending modes
+	/// </summary>
 	public enum BlendMode : uint
 	{
 		Src                                = 0x2000,

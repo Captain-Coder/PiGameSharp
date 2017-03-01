@@ -1,6 +1,6 @@
 ﻿namespace PiGameSharp.VG
 {
-	public enum MatrixMode : uint
+	internal enum MatrixMode : uint
 	{
 		PathUserToSurface              = 0x1400,
 		ImageUserToSurface             = 0x1401,

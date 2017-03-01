@@ -1,12 +1,22 @@
 ﻿using System;
 namespace PiGameSharp.VG
 {
-	public class Image : RenderGraph, IDisposable
+	/// <summary>
+	/// An OpenVG image
+	/// </summary>
+	public class Image : RenderNode, IDisposable
 	{
 		private Handle handle;
 		private Vector2 size;
 		private ImageFormat format;
 
+		/// <summary>
+		/// Initializes a new <see cref="PiGameSharp.VG.Image"/> with format, size and optinally data
+		/// </summary>
+		/// <param name="format">The pixel format to use for this image</param>
+		/// <param name="size">The size of the image</param>
+		/// <param name="data">The data with which to initialize this image, or null to keep the image unfilled</param>
+		/// <param name="scanlinestride">Offset for consecutive scan lines of the image in data.</param>
 		public Image(ImageFormat format, Vector2 size, byte[] data, int scanlinestride)
 		{
 			IntPtr hnd = VG.vgCreateImage(format, (int)size.x, (int)size.y, ImageRenderQuality.Better | ImageRenderQuality.Faster | ImageRenderQuality.NonAntialiased);
@@ -23,6 +33,10 @@ namespace PiGameSharp.VG
 				SetImageData(data, scanlinestride, new Rect(Vector2.Zero, size));
 		}
 
+		/// <summary>
+		/// Gets the size of the image
+		/// </summary>
+		/// <value>The size vector</value>
 		public Vector2 Size
 		{
 			get
@@ -31,6 +45,17 @@ namespace PiGameSharp.VG
 			}
 		}
 
+		/// <summary>
+		/// Sets the image contents
+		/// </summary>
+		/// <param name="data">The pixel data</param>
+		/// <param name="scanlinestride">Offset for consecutive scan lines of the image in data.</param>
+		/// <param name="destination">The rectangle of the image to fill</param>
+		/// <remarks>
+		/// The pixels should be packed into data with the pixel format used to construct this image.
+		/// There is no offset between pixels on a line. Consecutive lines are placed at scanlinestride intervals, measured
+		/// from line start to line start.
+		/// </remarks>
 		public void SetImageData(byte[] data, int scanlinestride, Rect destination)
 		{
 			if (handle == null)
@@ -45,6 +70,9 @@ namespace PiGameSharp.VG
 				throw new Exception("Set image data failed because " + err);
 		}
 
+		/// <summary>
+		/// Draw this image to the current OpenVG drawing surface.
+		/// </summary>
 		public override void Draw()
 		{
 			base.Draw();
@@ -54,7 +82,7 @@ namespace PiGameSharp.VG
 			VG.vgSet(Parameter.MATRIX_MODE, (int)MatrixMode.ImageUserToSurface);
 			if ((err = VG.vgGetError()) != ErrorCode.NoError)
 				throw new Exception("Set Matrix Mode failed because " + err);
-			VG.vgLoadMatrix(ref this.CompoundedTransform);
+			VG.vgLoadMatrix(ref this.WorldTransform);
 			if ((err = VG.vgGetError()) != ErrorCode.NoError)
 				throw new Exception("Load Matrix failed because " + err);
 			VG.vgDrawImage(handle);
@@ -62,12 +90,23 @@ namespace PiGameSharp.VG
 				throw new Exception("Draw image failed because " + err);
 		}
 
+		/// <summary>
+		/// Dumps the OpenVG parameters of this Image
+		/// </summary>
+		[Conditional("DEBUG")]
 		public void DumpParameters()
 		{
 			Console.WriteLine("Parameters for Image " + ((IntPtr)handle).ToString("X"));
 			VG.DumpContext(handle);
 		}
 
+		/// <summary>
+		/// Releases all resource used by the <see cref="PiGameSharp.VG.Image"/> object.
+		/// </summary>
+		/// <remarks>Call <see cref="Dispose"/> when you are finished using the <see cref="PiGameSharp.VG.Image"/>. The
+		/// <see cref="Dispose"/> method leaves the <see cref="PiGameSharp.VG.Image"/> in an unusable state. After calling
+		/// <see cref="Dispose"/>, you must release all references to the <see cref="PiGameSharp.VG.Image"/> so the garbage
+		/// collector can reclaim the memory that the <see cref="PiGameSharp.VG.Image"/> was occupying.</remarks>
 		public void Dispose()
 		{
 			if (handle != null)

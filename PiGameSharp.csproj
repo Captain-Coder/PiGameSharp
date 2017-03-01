@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -56,17 +58,13 @@
     <Compile Include="VG\MatrixMode.cs" />
     <Compile Include="VG\Parameter.cs" />
     <Compile Include="VG\ParameterInfoAttribute.cs" />
-    <Compile Include="VG\RenderGraph.cs" />
     <Compile Include="VG\Vector3.cs" />
     <Compile Include="VG\VG.cs" />
+    <Compile Include="Platform.cs" />
+    <Compile Include="VG\RenderNode.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="libOpenVG.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
@@ -76,4 +74,11 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <None Include="README" />
+    <None Include="PiGameSharp.dll.config">
+      <DeployService-Deploy>True</DeployService-Deploy>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>

@@ -1,6 +1,9 @@
 ﻿using System;
 namespace PiGameSharp.VG
 {
+	/// <summary>
+	/// OpenVG values for image formats
+	/// </summary>
 	public enum ImageFormat : uint
 	{
 		Rgbx8888          =  0,
@@ -25,24 +28,46 @@ namespace PiGameSharp.VG
 		ColorOrderBgr     = (1 << 7)
 	};
 
-	//contains extension methods for the ImageFormat enumeration
+	/// <summary>
+	/// Contains extension methods for ImageFormat enumeration members
+	/// </summary>
 	public static class ImageFormatQuery
 	{
-		public static bool IsColored(this ImageFormat fmt)
+		/// <summary>
+		/// Determines if the color format contains component color values
+		/// </summary>
+		/// <returns><c>true</c> if the format supports component color; otherwise, <c>false</c>.</returns>
+		/// <param name="fmt">The format to test</param>
+		public static bool HasComponentColor(this ImageFormat fmt)
 		{
 			return (uint)(fmt & ImageFormat.FormatMask) < 9 && (fmt & ImageFormat.FormatMask) != ImageFormat.Grayscale8;
 		}
 
+		/// <summary>
+		/// Determines if the color format contains an alpha component
+		/// </summary>
+		/// <returns><c>true</c> if the format has an alpha component; otherwise, <c>false</c>.</returns>
+		/// <param name="fmt">The format to test</param>
 		public static bool HasAlpha(this ImageFormat fmt)
 		{
 			return (uint)(fmt & ImageFormat.FormatMask) < 10 && fmt != ImageFormat.Rgb565 && fmt != ImageFormat.Grayscale8 || fmt == ImageFormat.AlphaOnly1 || fmt == ImageFormat.AlphaOnly4 || fmt == ImageFormat.AlphaOnly8;
 		}
 
+		/// <summary>
+		/// Determines if specified format is valid
+		/// </summary>
+		/// <returns><c>true</c> if the format is valid; otherwise, <c>false</c>.</returns>
+		/// <param name="fmt">The format to test</param>
 		public static bool IsValid(this ImageFormat fmt)
 		{
-			return ((fmt & ImageFormat.ColorOrderBgr) != ImageFormat.ColorOrderBgr || !fmt.IsColored()) && ((fmt & ImageFormat.AlphaFirst) != ImageFormat.AlphaFirst || !fmt.IsColored() || !fmt.HasAlpha());
+			return ((fmt & ImageFormat.ColorOrderBgr) != ImageFormat.ColorOrderBgr || !fmt.HasComponentColor()) && ((fmt & ImageFormat.AlphaFirst) != ImageFormat.AlphaFirst || !fmt.HasComponentColor() || !fmt.HasAlpha());
 		}
 
+		/// <summary>
+		/// Determines the number of bits every sample needs in the specified format
+		/// </summary>
+		/// <returns>The number of bits per sample</returns>
+		/// <param name="fmt">The format to evaluate</param>
 		public static uint BitsPerSample(this ImageFormat fmt)
 		{
 			switch (fmt & ImageFormat.FormatMask)

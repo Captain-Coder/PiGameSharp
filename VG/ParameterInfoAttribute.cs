@@ -2,7 +2,7 @@
 namespace PiGameSharp.VG
 {
 	[AttributeUsage(AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
-	sealed class ParameterInfoAttribute : Attribute
+	internal sealed class ParameterInfoAttribute : Attribute
 	{
 		public Type Type { get; set; }
 		public ParameterAccessor Access { get; set; }
@@ -137,7 +137,7 @@ namespace PiGameSharp.VG
 		}
 	}
 
-	enum ParameterAccessor
+	internal enum ParameterAccessor
 	{
 		Int,
 		Float,

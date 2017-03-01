@@ -1,5 +1,8 @@
 ﻿namespace PiGameSharp.EGL
 {
+	/// <summary>
+	/// Enumeration of return codes and errors that can be produced by EGL functions.
+	/// </summary>
 	public enum EglError : uint
 	{
 		Success            = 0x3000,

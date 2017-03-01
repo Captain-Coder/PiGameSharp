@@ -4,24 +4,13 @@ using PiGameSharp.Dispmanx;
 
 namespace PiGameSharp.EGL
 {
+	/// <summary>
+	/// Handles the specifics of managing the Embedded Graphics Library
+	/// </summary>
 	public static class EGL
 	{
-#if !WINDOWS
-		[DllImport("libbrcmEGL.so")] private static extern IntPtr eglGetDisplay(IntPtr native_display);
-		[DllImport("libbrcmEGL.so")] private static extern bool eglInitialize(IntPtr display, IntPtr major, IntPtr minor);	// int *major, *minor; can't define them as ref since null's can't be passed with ref keyword
-		[DllImport("libbrcmEGL.so")] private static extern bool eglBindAPI(EglApi api);
-		[DllImport("libbrcmEGL.so")] private static extern bool eglChooseConfig(IntPtr display, uint[] attrib_list, ref IntPtr config, uint size, ref uint num_config);
-		[DllImport("libbrcmEGL.so")] private static extern IntPtr eglCreateContext(IntPtr display, IntPtr config, IntPtr share_context, IntPtr attrib_list);
-		[DllImport("libbrcmEGL.so")] private static extern IntPtr eglCreateWindowSurface(IntPtr display, IntPtr config, IntPtr native_window, IntPtr attrib_list);
-		[DllImport("libbrcmEGL.so")] private static extern bool eglMakeCurrent(IntPtr display, IntPtr draw_surface, IntPtr read_surface, IntPtr context);
-		[DllImport("libbrcmEGL.so")] private static extern bool eglSwapBuffers(IntPtr display, IntPtr surface);
-		[DllImport("libbrcmEGL.so")] private static extern bool eglDestroySurface(IntPtr display, IntPtr surface);
-		[DllImport("libbrcmEGL.so")] private static extern bool eglDestroyContext(IntPtr display, IntPtr context);
-		[DllImport("libbrcmEGL.so")] private static extern bool eglTerminate(IntPtr display);
-		[DllImport("libbrcmEGL.so")] private static extern EglError eglGetError();
-#else
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] private static extern IntPtr eglGetDisplay(IntPtr native_display);
-		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] private static extern bool eglInitialize(IntPtr display, IntPtr major, IntPtr minor);	// int *major, *minor; can't define them as ref since null's can't be passed with ref keyword
+		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] private static extern bool eglInitialize(IntPtr display, IntPtr major, IntPtr minor);
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] private static extern bool eglBindAPI(EglApi api);
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] private static extern bool eglChooseConfig(IntPtr display, uint[] attrib_list, ref IntPtr config, uint size, ref uint num_config);
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] private static extern IntPtr eglCreateContext(IntPtr display, IntPtr config, IntPtr share_context, IntPtr attrib_list);
@@ -35,35 +24,61 @@ namespace PiGameSharp.EGL
 
 		[DllImport("user32.dll")] static extern IntPtr GetDC(IntPtr hwnd);
 		[DllImport("user32.dll")] static extern int ReleaseDC(IntPtr hwnd, IntPtr hdc);
-#endif
 
 		private static Handle display;
 		private static IntPtr config;
 		private static Handle context;
 		private static Handle windowsurface;
 
-#if WINDOWS
-		public static void Init(IntPtr hwnd, EglApi bind)
+		/// <summary>
+		/// Initialize EGL on the Miscrosoft Windows platform. Requires a window handle.
+		/// </summary>
+		/// <param name="hwnd">The Window handle to initialize EGL on</param>
+		/// <param name="bind">The EGL API to bind the current thread to</param>
+		public static void InitWin32(IntPtr hwnd, EglApi bind)
 		{
-			if (display != IntPtr.Zero)
-				return;
-
-			IntPtr d;
 			Handle hdc = new Handle("Windows Device Context", GetDC(hwnd), delegate(IntPtr h)
-				{
-					ReleaseDC(hwnd, h);
-				});
+			{
+				ReleaseDC(hwnd, h);
+			});
+			Init(hwnd, hdc, bind, null);
+		}
 
-#else			
-		public static void Init(DisplayDevice device, EglApi bind)
+		/// <summary>
+		/// Initialize EGL on the Dispmanx platform. Requires a Dispmanx DisplayDevice
+		/// </summary>
+		/// <param name="device">The Dispmanx DisplayDevice to initialize EGL on</param>
+		/// <param name="bind">The EGL API to bind the current thread to</param>
+		public static void InitDispmanx(DisplayDevice device, EglApi bind)
+		{
+			// Important stuff! https://www.raspberrypi.org/forums/viewtopic.php?f=68&t=30261 (halleluya for this guy catching this! Would have taken me a while...)
+			// Apparently the expectation of EGL is that window objects stay in place. Well that might be true for C/C++/X11/Win32 but it certainly isn't in .net world.
+			// So we have to ensure we never move the struct we are gonna give to eglCreateWindowSurface, otherwise you get mayhem and madness! (belive me I checked).
+			// Two options are, using a GCHandle with pinned type, or Marshal heap allocation. Where the latter is designed for this situation, and GCHandle involves
+			// dealing with valuetype boxing effects.
+			IntPtr hwnd = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(EglDispmanxWindow)));
+			Marshal.StructureToPtr(new EglDispmanxWindow() { dispmanx_element = device.Element, size = device.Mode.Size }, hwnd, false);
+			Init(hwnd, IntPtr.Zero, bind, delegate {
+				Marshal.FreeHGlobal(hwnd);
+			});
+
+			PiGameSharp.VG.VG.RenderSize = device.Mode.Size;
+		}
+
+		/// <summary>
+		/// Initialize EGL on an X11 window
+		/// </summary>
+		/// <param name="bind">The EGL API to bind the current thread to</param>
+		public static void InitX11(EglApi bind)
+		{
+		}
+
+		private static void Init(IntPtr hwnd, IntPtr hdc, EglApi bind, Action hdcfree)
 		{
 			if (display != IntPtr.Zero)
 				return;
 
 			IntPtr d;
-			IntPtr hdc = IntPtr.Zero, hwnd = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(EglDispmanxWindow)));
-			Marshal.StructureToPtr(new EglDispmanxWindow() { dispmanx_element = device.Element, size = device.Mode.Size }, hwnd, false);
-#endif
 			display = new Handle(
 				"EGL Display Connection",
 				d = eglGetDisplay(hdc),
@@ -80,8 +95,7 @@ namespace PiGameSharp.EGL
 			if (!eglBindAPI(bind))
 				throw new Exception("Unable to bind to API " + bind + ": " + eglGetError());
 			
-			//    EGL_LUMINANCE_SIZE,     EGL_DONT_CARE,
-			
+			//TODO: make enum for these consts...
 			if (!eglChooseConfig(display, new uint[] { 0x3024, 8, 0x3023, 8, 0x3022, 8, 0x3021, 8,  0x3033, 4, 0x3031, 1, 0x3040, 2, 0x3038 }, ref config, 1, ref config_count) || config_count != 1)
 				throw new Exception("Unable to choose config " + eglGetError());
 			context = new Handle(
@@ -94,11 +108,7 @@ namespace PiGameSharp.EGL
 				});
 			if (context.IsInvalid)
 				throw new Exception("Unable to create context " + eglGetError());
-			// Important stuff! https://www.raspberrypi.org/forums/viewtopic.php?f=68&t=30261 (halleluya for this guy catching this! Would have taken me a while...)
-			// Apparently the expectation of EGL is that window objects stay in place. Well that might be true for C/C++/X11/Win32 but it certainly isn't in .net world.
-			// So we have to ensure we never move the struct we are gonna give to eglCreateWindowSurface, otherwise you get mayhem and madness! (belive me I checked).
-			// Two options are, using a GCHandle with pinned type, or Marshal heap allocation. Where the latter is designed for this situation, and GCHandle involves
-			// dealing with valuetype boxing effects.
+
 			windowsurface = new Handle(
 				"EGL Window Surface",
 				eglCreateWindowSurface(display, config, hwnd, IntPtr.Zero),
@@ -106,9 +116,8 @@ namespace PiGameSharp.EGL
 				{
 					if (!eglDestroySurface(d, h))
 						throw new Exception("Unable to destroy window surface " + eglGetError());
-#if !WINDOWS
-					Marshal.FreeHGlobal(hdc);
-#endif
+					if (hdcfree != null)
+						hdcfree();
 				});
 			if (windowsurface.IsInvalid)
 				throw new Exception("Unable to create window surface " + eglGetError());
@@ -117,15 +126,13 @@ namespace PiGameSharp.EGL
 				throw new Exception("Unable to make surface and context current " + eglGetError());
 
 			if (bind == EglApi.OpenVG)
-			{
-#if !WINDOWS
-				PiGameSharp.VG.VG.RenderSize = device.Mode.Size;
-#endif
-				//this apparently forces egl to reevaluate the sizes of the color buffers
+				//this apparently forces egl to reevaluate the sizes of the color buffers, so we are ready to draw stuff.
 				Swap();
-			}
 		}
 
+		/// <summary>
+		/// Deinitialize EGL and release all resources
+		/// </summary>
 		public static void Deinit()
 		{
 			if (display == null || display == IntPtr.Zero)

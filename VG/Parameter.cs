@@ -1,5 +1,8 @@
 ﻿namespace PiGameSharp.VG
 {
+	/// <summary>
+	/// The OpenVG parameters that can be used
+	/// </summary>
 	public enum Parameter : uint
 	{
 		// Context Parameters
@@ -78,10 +81,6 @@
 		// Font Parameters
 		FONT_NUM_GLYPHS                          = 0x2F00
 
-		//RENDERING_QUALITY_NONANTIALIASED         = 0x1200,
-		//RENDERING_QUALITY_FASTER                 = 0x1201,
-		//RENDERING_QUALITY_BETTER                 = 0x1202,  /* Default */
-
 		//PIXEL_LAYOUT_UNKNOWN                     = 0x1300,
 		//PIXEL_LAYOUT_RGB_VERTICAL                = 0x1301,
 		//PIXEL_LAYOUT_BGR_VERTICAL                = 0x1302,
@@ -105,6 +104,7 @@
 
 		//EVEN_ODD                                 = 0x1900,
 		//NON_ZERO                                 = 0x1901,
+
 		//PAINT_TYPE_COLOR                         = 0x1B00,
 		//PAINT_TYPE_LINEAR_GRADIENT               = 0x1B01,
 		//PAINT_TYPE_RADIAL_GRADIENT               = 0x1B02,
@@ -121,17 +121,6 @@
 		//DRAW_IMAGE_NORMAL                        = 0x1F00,
 		//DRAW_IMAGE_MULTIPLY                      = 0x1F01,
 		//DRAW_IMAGE_STENCIL                       = 0x1F02,
-
-		//BLEND_SRC                                = 0x2000,
-		//BLEND_SRC_OVER                           = 0x2001,
-		//BLEND_DST_OVER                           = 0x2002,
-		//BLEND_SRC_IN                             = 0x2003,
-		//BLEND_DST_IN                             = 0x2004,
-		//BLEND_MULTIPLY                           = 0x2005,
-		//BLEND_SCREEN                             = 0x2006,
-		//BLEND_DARKEN                             = 0x2007,
-		//BLEND_LIGHTEN                            = 0x2008,
-		//BLEND_ADDITIVE                           = 0x2009,
 
 		//IMAGE_FORMAT_QUERY                       = 0x2100, 
 		//PATH_DATATYPE_QUERY                      = 0x2101,

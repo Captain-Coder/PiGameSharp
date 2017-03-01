@@ -3,34 +3,35 @@ using System.Threading;
 
 namespace PiGameSharp.Dispmanx
 {
-	public class DisplayDevice
+	/// <summary>
+	/// A dispmanx display for displaying things
+	/// </summary>
+	public sealed class DisplayDevice
 	{
-		public readonly uint Id;
+		/// <summary>
+		/// Information about the mode of this display.
+		/// </summary>
 		public readonly ModeInfo Mode;
+
 		private Handle handle;
 		private Handle element;
 
-		public DisplayDevice(uint id, ModeInfo mode)
+		internal DisplayDevice(ModeInfo mode)
 		{
-			Id = id;
 			Mode = mode;
-		}
-
-		public override string ToString()
-		{
-			return "Display Device 0x" + Id.ToString("X");
 		}
 
 		internal Handle DisplayHandle
 		{
 			get
 			{
+				// Has the display already been opened?
 				if (handle != IntPtr.Zero)
 					return handle;
 
 				handle = new Handle(
 					"Dispmanx Display",
-					BcmHost.vc_dispmanx_display_open(Id),
+					BcmHost.vc_dispmanx_display_open(Mode.DisplayNumber),
 					delegate(IntPtr h)
 					{
 						if (BcmHost.vc_dispmanx_display_close(h) < 0)
@@ -42,8 +43,10 @@ namespace PiGameSharp.Dispmanx
 			}
 		}
 
-		public void CloseHandle()
+		internal void CloseDisplayHandle()
 		{
+			// This one can potentially be called from (critical) finalizers, thus we have to watch for
+			// multiple concurrent calls on different threads and make sure we don't throw anything... ever.
 			Handle h = Interlocked.Exchange<Handle>(ref handle, null);
 			if (h != null)
 				h.Close();
@@ -66,20 +69,27 @@ namespace PiGameSharp.Dispmanx
 							throw new Exception("Unable to remove element");
 						BcmHost.DoUpdate();
 					});
-				BcmHost.vc_dispmanx_display_set_background(BcmHost.Update, DisplayHandle, 0, 0, 0);
 				BcmHost.DoUpdate();
 
 				return element;
 			}
 		}
 
-		public void CloseElement()
+		internal void CloseElement()
 		{
+			// This one can potentially be called from (critical) finalizers, thus we have to watch for
+			// multiple concurrent calls on different threads and make sure we don't throw anything... ever.
 			Handle h = Interlocked.Exchange<Handle>(ref element, null);
 			if (h != null)
 				h.Close();
 		}
 
+		/// <summary>
+		/// Sets the background color of the display
+		/// </summary>
+		/// <param name="r">The red component</param>
+		/// <param name="g">The green component</param>
+		/// <param name="b">The blue component</param>
 		public void SetBackground(byte r, byte g, byte b)
 		{
 			BcmHost.vc_dispmanx_display_set_background(BcmHost.Update, DisplayHandle, r, g, b);

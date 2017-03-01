@@ -2,42 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace PiGameSharp.VG
 {
 	public static class VG
 	{
-#if !WINDOWS
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl)] internal static extern ErrorCode vgGetError();
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgFinish();
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgClear(int x, int y, int width, int height);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgGetVectorSize")] internal static extern int vgGetArraySize(Parameter type);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgGetParameterVectorSize")] internal static extern int vgGetArraySize(IntPtr handle, Parameter type);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgGeti")]           internal static extern int   vgGeti(Parameter type);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgSeti")]           internal static extern void  vgSet(Parameter type, int value);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgGetf")]           internal static extern float vgGetf(Parameter type);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgSetf")]           internal static extern void  vgSet(Parameter type, float value);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgGetiv")]          internal static extern void  vgGet(Parameter type, int count, [In] int[] values);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgSetiv")]          internal static extern void  vgSet(Parameter type, int count, [Out] int[] values);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgGetfv")]          internal static extern void  vgGet(Parameter type, int count, [In] float[] values);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgSetfv")]          internal static extern void  vgSet(Parameter type, int count, [Out] float[] values);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgGetParameteri")]  internal static extern int   vgGeti(IntPtr handle, Parameter type);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgSetParameteri")]  internal static extern void  vgSet(IntPtr handle, Parameter type, int value);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgGetParameterf")]  internal static extern float vgGetf(IntPtr handle, Parameter type);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgSetParameterf")]  internal static extern void  vgSet(IntPtr handle, Parameter type, float value);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgGetParameteriv")] internal static extern void  vgGet(IntPtr handle, Parameter type, int count, [In] int[] values);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgSetParameteriv")] internal static extern void  vgSet(IntPtr handle, Parameter type, int count, [In, Out] int[] values);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgGetParameterfv")] internal static extern void  vgSet(IntPtr handle, Parameter type, int count, [In] float[] values);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl, EntryPoint="vgSetParameterfv")] internal static extern void  vgGet(IntPtr handle, Parameter type, int count, [In, Out] float[] values);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgLoadIdentity();
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgLoadMatrix(ref Matrix m);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgGetMatrix(ref Matrix m);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgMultMatrix(ref Matrix m);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl)] internal static extern IntPtr vgCreateImage(ImageFormat format, int width, int height, ImageRenderQuality acceptable);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgImageSubData(IntPtr image, byte[] data, int dataStride, ImageFormat dataFormat, uint x, uint y, uint width, uint height);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgDrawImage(IntPtr image);
-		[DllImport("libbrcmOpenVG.so", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgDestroyImage(IntPtr image);
-#else
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] internal static extern ErrorCode vgGetError();
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgFinish();
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgClear(int x, int y, int width, int height);
@@ -67,10 +38,10 @@ namespace PiGameSharp.VG
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgImageSubData(IntPtr image, byte[] data, int dataStride, ImageFormat dataFormat, uint x, uint y, uint width, uint height);
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgDrawImage(IntPtr image);
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgDestroyImage(IntPtr image);
-#endif
 
 		public static int MaxImageWidth
 		{
+			[MethodImpl(MethodImplAttributes.NoInlining)]
 			get
 			{
 				return vgGeti(Parameter.MAX_IMAGE_WIDTH);
@@ -78,6 +49,7 @@ namespace PiGameSharp.VG
 		}
 		public static int MaxImageHeight
 		{
+			[MethodImpl(MethodImplAttributes.NoInlining)]
 			get
 			{
 				return vgGeti(Parameter.MAX_IMAGE_HEIGHT);
@@ -85,6 +57,7 @@ namespace PiGameSharp.VG
 		}
 		public static int MaxImagePixels
 		{
+			[MethodImpl(MethodImplAttributes.NoInlining)]
 			get
 			{
 				return vgGeti(Parameter.MAX_IMAGE_PIXELS);
@@ -92,6 +65,7 @@ namespace PiGameSharp.VG
 		}
 		public static int MaxImageBytes
 		{
+			[MethodImpl(MethodImplAttributes.NoInlining)]
 			get
 			{
 				return vgGeti(Parameter.MAX_IMAGE_BYTES);
@@ -100,10 +74,12 @@ namespace PiGameSharp.VG
 
 		public static BlendMode Blending
 		{
+			[MethodImpl(MethodImplAttributes.NoInlining)]
 			get
 			{
 				return (BlendMode)vgGeti(Parameter.BLEND_MODE);
 			}
+			[MethodImpl(MethodImplAttributes.NoInlining)]
 			set
 			{
 				vgSet(Parameter.BLEND_MODE, (int)value);
@@ -112,10 +88,12 @@ namespace PiGameSharp.VG
 
 		public static ImageRenderQuality ImageQuality
 		{
+			[MethodImpl(MethodImplAttributes.NoInlining)]
 			get
 			{
 				return (ImageRenderQuality)vgGeti(Parameter.IMAGE_QUALITY);
 			}
+			[MethodImpl(MethodImplAttributes.NoInlining)]
 			set
 			{
 				vgSet(Parameter.IMAGE_QUALITY, (int)value);
@@ -147,29 +125,34 @@ namespace PiGameSharp.VG
 
 		public static Vector2 RenderSize { get; set; }
 
+		[MethodImpl(MethodImplAttributes.NoInlining)]
 		public static void Show()
 		{
 			vgFinish();
 			PiGameSharp.EGL.EGL.Swap();
 		}
 
+		[MethodImpl(MethodImplAttributes.NoInlining)]
 		public static void Clear()
 		{
 			vgSet(Parameter.CLEAR_COLOR, 4, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
 			vgClear(0, 0, (int)RenderSize.x, (int)RenderSize.y);
 		}
 
+		[Conditional("DEBUG")]
 		public static void DumpContext()
 		{
 			DumpContext(null);
 		}
 
+		[Conditional("DEBUG")]
 		internal static void DumpContext(Handle h)
 		{
 			foreach (Parameter p in Enum.GetValues(typeof(Parameter)))
 				DumpParameter(p, h==null?IntPtr.Zero:h);
 		}
 
+		[Conditional("DEBUG")]
 		private static void DumpParameter(Parameter p, IntPtr handle)
 		{
 			object val = ParameterInfoAttribute.Get(p, handle);
@@ -185,11 +168,7 @@ namespace PiGameSharp.VG
 			}
 			else if (val is float[])
 				val = "{" + string.Join(", ", (float[])val) + "}";
-#if WINDOWS
 			System.Diagnostics.Debug.WriteLine("Parameter: " + p + " value: " + val);
-#else
-			Console.WriteLine("Parameter: " + p + " value: " + val);
-#endif
 		}
 	}
 }

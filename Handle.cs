@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+
 namespace PiGameSharp
 {
 	internal class Handle : CriticalHandle
@@ -13,7 +14,7 @@ namespace PiGameSharp
 			Tag = tag;
 			handle = hnd;
 			Release = release;
-			Out("Allocated handle 0x" + handle.ToString("X") + " tag: " + Tag);
+			System.Diagnostics.Debug.WriteLine("Allocated handle 0x" + handle.ToString("X") + " tag: " + Tag);
 		}
 
 		public override bool IsInvalid
@@ -29,11 +30,11 @@ namespace PiGameSharp
 			Action<IntPtr> rel = Interlocked.Exchange(ref Release, null);
 			if (rel != null)
 			{
-				Out("Releasing handle 0x" + handle.ToString("X") + " tag: " + Tag);
+				System.Diagnostics.Debug.WriteLine("Releasing handle 0x" + handle.ToString("X") + " tag: " + Tag);
 				rel(handle);
 			}
 			else
-				Out("Double release handle 0x" + handle.ToString("X") + " tag: " + Tag);
+				System.Diagnostics.Debug.WriteLine("Double release handle 0x" + handle.ToString("X") + " tag: " + Tag);
 			return rel != null;
 		}
 
@@ -42,15 +43,6 @@ namespace PiGameSharp
 			if (inst == null)
 				return IntPtr.Zero;
 			return inst.handle;
-		}
-
-		public static void Out(string msg)
-		{
-#if WINDOWS
-			System.Diagnostics.Debug.WriteLine(msg);
-#else
-			Console.WriteLine(msg);
-#endif
 		}
 	}
 }
