@@ -15,10 +15,10 @@ namespace PiGameSharp
 		/// <summary>
 		/// Detect the current platform and perform relevant initialisation
 		/// </summary>
-		public static void Init()
+		public static void Init(object target)
 		{
 			if (Environment.OSVersion.Platform == PlatformID.Win32NT)
-				WindowsInit();
+				WindowsInit(target);
 			else if (Environment.OSVersion.Platform == PlatformID.Unix)
 			{
 				string hw = File.ReadAllText("/proc/cpuinfo");
@@ -39,14 +39,12 @@ namespace PiGameSharp
 				deinit();
 		}
 
-		private static void WindowsInit()
+		private static void WindowsInit(object target)
 		{
-			deinit = WindowsDenit;
-		}
+			if (!(target is IntPtr))
+				throw new ArgumentException("Windows init expects a window handle IntPtr");
 
-		private static void WindowsDenit()
-		{
-
+			PiGameSharp.EGL.EGL.InitWin32((IntPtr)target, EglApi.OpenVG);
 		}
 
 		private static void PiInit()
@@ -54,7 +52,8 @@ namespace PiGameSharp
 			deinit = PiDeinit;
 
 			BcmHost.Init();
-			if (BcmHost.Devices.Count < 0)
+			Console.WriteLine("After init");
+			if (BcmHost.Devices == null || BcmHost.Devices.Count < 0)
 				throw new Exception("No dispmanx display available");
 			PiGameSharp.EGL.EGL.InitDispmanx(BcmHost.Devices[0], EglApi.OpenVG);
 		}

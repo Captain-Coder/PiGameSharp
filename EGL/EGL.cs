@@ -22,13 +22,23 @@ namespace PiGameSharp.EGL
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] private static extern bool eglTerminate(IntPtr display);
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] private static extern EglError eglGetError();
 
-		[DllImport("user32.dll")] static extern IntPtr GetDC(IntPtr hwnd);
-		[DllImport("user32.dll")] static extern int ReleaseDC(IntPtr hwnd, IntPtr hdc);
+		[DllImport("user32.dll")] private static extern IntPtr GetDC(IntPtr hwnd);
+		[DllImport("user32.dll")] private static extern int ReleaseDC(IntPtr hwnd, IntPtr hdc);
 
 		private static Handle display;
 		private static IntPtr config;
 		private static Handle context;
 		private static Handle windowsurface;
+		private static Handle extrahandle;
+
+		/// <summary>
+		/// Performance counter to measure framerate
+		/// </summary>
+		public static PerformanceCounter frames = new PerformanceCounter("EGL.Swap()")
+			{
+				Unit = "Frames",
+				SampleInterval = TimeSpan.FromSeconds(10)
+			};
 
 		/// <summary>
 		/// Initialize EGL on the Miscrosoft Windows platform. Requires a window handle.
@@ -37,11 +47,11 @@ namespace PiGameSharp.EGL
 		/// <param name="bind">The EGL API to bind the current thread to</param>
 		public static void InitWin32(IntPtr hwnd, EglApi bind)
 		{
-			Handle hdc = new Handle("Windows Device Context", GetDC(hwnd), delegate(IntPtr h)
+			extrahandle = new Handle("Windows Device Context", GetDC(hwnd), delegate(IntPtr h)
 			{
 				ReleaseDC(hwnd, h);
 			});
-			Init(hwnd, hdc, bind, null);
+			Init(hwnd, extrahandle, bind);
 		}
 
 		/// <summary>
@@ -56,11 +66,9 @@ namespace PiGameSharp.EGL
 			// So we have to ensure we never move the struct we are gonna give to eglCreateWindowSurface, otherwise you get mayhem and madness! (belive me I checked).
 			// Two options are, using a GCHandle with pinned type, or Marshal heap allocation. Where the latter is designed for this situation, and GCHandle involves
 			// dealing with valuetype boxing effects.
-			IntPtr hwnd = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(EglDispmanxWindow)));
-			Marshal.StructureToPtr(new EglDispmanxWindow() { dispmanx_element = device.Element, size = device.Mode.Size }, hwnd, false);
-			Init(hwnd, IntPtr.Zero, bind, delegate {
-				Marshal.FreeHGlobal(hwnd);
-			});
+			extrahandle = new Handle("EGL Native Window", Marshal.AllocHGlobal(Marshal.SizeOf(typeof(EglDispmanxWindow))), Marshal.FreeHGlobal);
+			Marshal.StructureToPtr(new EglDispmanxWindow() { dispmanx_element = device.Element, size = device.Mode.Size }, extrahandle, false);
+			Init(extrahandle, IntPtr.Zero, bind);
 
 			PiGameSharp.VG.VG.RenderSize = device.Mode.Size;
 		}
@@ -73,7 +81,7 @@ namespace PiGameSharp.EGL
 		{
 		}
 
-		private static void Init(IntPtr hwnd, IntPtr hdc, EglApi bind, Action hdcfree)
+		private static void Init(IntPtr hwnd, IntPtr hdc, EglApi bind)
 		{
 			if (display != IntPtr.Zero)
 				return;
@@ -116,8 +124,6 @@ namespace PiGameSharp.EGL
 				{
 					if (!eglDestroySurface(d, h))
 						throw new Exception("Unable to destroy window surface " + eglGetError());
-					if (hdcfree != null)
-						hdcfree();
 				});
 			if (windowsurface.IsInvalid)
 				throw new Exception("Unable to create window surface " + eglGetError());
@@ -125,9 +131,8 @@ namespace PiGameSharp.EGL
 			if (!eglMakeCurrent(display, windowsurface, windowsurface, context))
 				throw new Exception("Unable to make surface and context current " + eglGetError());
 
-			if (bind == EglApi.OpenVG)
-				//this apparently forces egl to reevaluate the sizes of the color buffers, so we are ready to draw stuff.
-				Swap();
+			//this apparently forces egl to reevaluate the sizes of the color buffers, so we are ready to draw stuff.
+			Swap();
 		}
 
 		/// <summary>
@@ -145,11 +150,15 @@ namespace PiGameSharp.EGL
 			if (context != null)
 				context.Close();
 			display.Close();
-			windowsurface = context = display = null;
+			if (extrahandle != null)
+				extrahandle.Close();
+
+			windowsurface = context = display = extrahandle = null;
 		}
 
 		internal static void Swap()
 		{
+			frames++;
 			if (!eglSwapBuffers(display, windowsurface))
 				throw new Exception("Unable to swap buffers " + eglGetError());
 		}

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+
 namespace PiGameSharp.VG
 {
 	/// <summary>
@@ -6,6 +8,15 @@ namespace PiGameSharp.VG
 	/// </summary>
 	public class Image : RenderNode, IDisposable
 	{
+		/// <summary>
+		/// Performance counter to measure image draw rate
+		/// </summary>
+		public static PerformanceCounter draws = new PerformanceCounter("Image.Draw()")
+			{
+				SampleInterval = TimeSpan.FromSeconds(10),
+				Unit = "calls"
+			};
+
 		private Handle handle;
 		private Vector2 size;
 		private ImageFormat format;
@@ -76,18 +87,20 @@ namespace PiGameSharp.VG
 		public override void Draw()
 		{
 			base.Draw();
+			Matrix wt = this.WorldTransform;
 			ErrorCode err;
 			if (handle == null)
 				throw new ObjectDisposedException("Some Image");
 			VG.vgSet(Parameter.MATRIX_MODE, (int)MatrixMode.ImageUserToSurface);
 			if ((err = VG.vgGetError()) != ErrorCode.NoError)
 				throw new Exception("Set Matrix Mode failed because " + err);
-			VG.vgLoadMatrix(ref this.WorldTransform);
+			VG.vgLoadMatrix(ref wt);
 			if ((err = VG.vgGetError()) != ErrorCode.NoError)
 				throw new Exception("Load Matrix failed because " + err);
 			VG.vgDrawImage(handle);
 			if ((err = VG.vgGetError()) != ErrorCode.NoError)
 				throw new Exception("Draw image failed because " + err);
+			draws++;
 		}
 
 		/// <summary>

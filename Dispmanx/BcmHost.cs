@@ -8,7 +8,7 @@ namespace PiGameSharp.Dispmanx
     /// <summary>
     /// Handles the specifics of the RaspberryPi/Dispmanx
     /// </summary>
-	public static sealed class BcmHost
+	public static class BcmHost
     {
 		[DllImport("libbcm_host.so")] private static extern void bcm_host_init();
 		[DllImport("libbcm_host.so")] private static extern void bcm_host_deinit();
@@ -64,7 +64,7 @@ namespace PiGameSharp.Dispmanx
 			// But it does not declare this as a requirement since this would be a circular import (gles depends on egl). To fix this we have to make sure to touch libbrcmGLESv2.so before
 			// touching libEGL.so. This causes them both to be loaded in the right order. But this has to happen before we touch libEGL. So this is one of the few places where this is
 			// possible. And even though this works now, this depends on CLI specifics (mono in this case), so there is no guarantee this will keep working. So to force libbrcmGLESv2.so to load 
-			// choose an innocent function from gles and call it. 
+			// choose an innocent function from gles and call it.
 		}
 
 		/// <summary>
