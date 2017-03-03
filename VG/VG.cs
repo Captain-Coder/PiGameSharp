@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace PiGameSharp.VG
 {
@@ -41,7 +42,7 @@ namespace PiGameSharp.VG
 
 		public static int MaxImageWidth
 		{
-			[MethodImpl(MethodImplAttributes.NoInlining)]
+			[MethodImpl(MethodImplOptions.NoInlining)]
 			get
 			{
 				return vgGeti(Parameter.MAX_IMAGE_WIDTH);
@@ -49,7 +50,7 @@ namespace PiGameSharp.VG
 		}
 		public static int MaxImageHeight
 		{
-			[MethodImpl(MethodImplAttributes.NoInlining)]
+			[MethodImpl(MethodImplOptions.NoInlining)]
 			get
 			{
 				return vgGeti(Parameter.MAX_IMAGE_HEIGHT);
@@ -57,7 +58,7 @@ namespace PiGameSharp.VG
 		}
 		public static int MaxImagePixels
 		{
-			[MethodImpl(MethodImplAttributes.NoInlining)]
+			[MethodImpl(MethodImplOptions.NoInlining)]
 			get
 			{
 				return vgGeti(Parameter.MAX_IMAGE_PIXELS);
@@ -65,7 +66,7 @@ namespace PiGameSharp.VG
 		}
 		public static int MaxImageBytes
 		{
-			[MethodImpl(MethodImplAttributes.NoInlining)]
+			[MethodImpl(MethodImplOptions.NoInlining)]
 			get
 			{
 				return vgGeti(Parameter.MAX_IMAGE_BYTES);
@@ -74,12 +75,12 @@ namespace PiGameSharp.VG
 
 		public static BlendMode Blending
 		{
-			[MethodImpl(MethodImplAttributes.NoInlining)]
+			[MethodImpl(MethodImplOptions.NoInlining)]
 			get
 			{
 				return (BlendMode)vgGeti(Parameter.BLEND_MODE);
 			}
-			[MethodImpl(MethodImplAttributes.NoInlining)]
+			[MethodImpl(MethodImplOptions.NoInlining)]
 			set
 			{
 				vgSet(Parameter.BLEND_MODE, (int)value);
@@ -88,12 +89,12 @@ namespace PiGameSharp.VG
 
 		public static ImageRenderQuality ImageQuality
 		{
-			[MethodImpl(MethodImplAttributes.NoInlining)]
+			[MethodImpl(MethodImplOptions.NoInlining)]
 			get
 			{
 				return (ImageRenderQuality)vgGeti(Parameter.IMAGE_QUALITY);
 			}
-			[MethodImpl(MethodImplAttributes.NoInlining)]
+			[MethodImpl(MethodImplOptions.NoInlining)]
 			set
 			{
 				vgSet(Parameter.IMAGE_QUALITY, (int)value);
@@ -125,14 +126,14 @@ namespace PiGameSharp.VG
 
 		public static Vector2 RenderSize { get; set; }
 
-		[MethodImpl(MethodImplAttributes.NoInlining)]
+		[MethodImpl(MethodImplOptions.NoInlining)]
 		public static void Show()
 		{
 			vgFinish();
 			PiGameSharp.EGL.EGL.Swap();
 		}
 
-		[MethodImpl(MethodImplAttributes.NoInlining)]
+		[MethodImpl(MethodImplOptions.NoInlining)]
 		public static void Clear()
 		{
 			vgSet(Parameter.CLEAR_COLOR, 4, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
