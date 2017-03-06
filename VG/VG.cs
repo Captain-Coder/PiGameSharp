@@ -84,6 +84,7 @@ namespace PiGameSharp.VG
 			set
 			{
 				vgSet(Parameter.BLEND_MODE, (int)value);
+				DetectError("Error setting blend mode");
 			}
 		}
 
@@ -98,6 +99,7 @@ namespace PiGameSharp.VG
 			set
 			{
 				vgSet(Parameter.IMAGE_QUALITY, (int)value);
+				DetectError("Error setting image quality");
 			}
 		}
 
@@ -121,6 +123,7 @@ namespace PiGameSharp.VG
 					vgSet(Parameter.RENDERING_QUALITY, 0x1201);
 				else if (value == ImageRenderQuality.Better)
 					vgSet(Parameter.RENDERING_QUALITY, 0x1202);
+				DetectError("Error setting render quality");
 			}
 		}
 
@@ -129,7 +132,10 @@ namespace PiGameSharp.VG
 		[MethodImpl(MethodImplOptions.NoInlining)]
 		public static void Show()
 		{
+			ErrorCode err;
 			vgFinish();
+			if ((err = vgGetError()) != ErrorCode.NoError)
+				throw new Exception("Error detected on show frame (" + err + ")");
 			PiGameSharp.EGL.EGL.Swap();
 		}
 
@@ -137,7 +143,9 @@ namespace PiGameSharp.VG
 		public static void Clear()
 		{
 			vgSet(Parameter.CLEAR_COLOR, 4, new float[] { 1.0f, 1.0f, 1.0f, 1.0f });
+			DetectError("Error setting clear color");
 			vgClear(0, 0, (int)RenderSize.x, (int)RenderSize.y);
+			DetectError("Error clearing");
 		}
 
 		[Conditional("DEBUG")]
@@ -170,6 +178,14 @@ namespace PiGameSharp.VG
 			else if (val is float[])
 				val = "{" + string.Join(", ", (float[])val) + "}";
 			System.Diagnostics.Debug.WriteLine("Parameter: " + p + " value: " + val);
+		}
+
+		[Conditional("DEBUG")]
+		public static void DetectError(string msg)
+		{
+			ErrorCode err;
+			if ((err = vgGetError()) != ErrorCode.NoError)
+				throw new Exception(msg + " (" + err + ")");
 		}
 	}
 }

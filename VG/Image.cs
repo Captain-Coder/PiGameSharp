@@ -76,9 +76,7 @@ namespace PiGameSharp.VG
 			if (data == null || lastbyte < 0 || data.Length < lastbyte)
 				throw new ArgumentException("Expected " + lastbyte + " bytes, got " + (data==null?"null":data.Length.ToString()));
 			VG.vgImageSubData(handle, data, scanlinestride, this.format, destination.pos.x, destination.pos.y, destination.size.x, destination.size.y);
-			ErrorCode err;
-			if ((err = VG.vgGetError()) != ErrorCode.NoError)
-				throw new Exception("Set image data failed because " + err);
+			VG.DetectError("Set image data failed");
 		}
 
 		/// <summary>
@@ -87,19 +85,15 @@ namespace PiGameSharp.VG
 		public override void Draw()
 		{
 			base.Draw();
-			Matrix wt = this.WorldTransform;
-			ErrorCode err;
 			if (handle == null)
 				throw new ObjectDisposedException("Some Image");
+			Matrix wt = this.WorldTransform;
 			VG.vgSet(Parameter.MATRIX_MODE, (int)MatrixMode.ImageUserToSurface);
-			if ((err = VG.vgGetError()) != ErrorCode.NoError)
-				throw new Exception("Set Matrix Mode failed because " + err);
+			VG.DetectError("Set Matrix Mode failed");
 			VG.vgLoadMatrix(ref wt);
-			if ((err = VG.vgGetError()) != ErrorCode.NoError)
-				throw new Exception("Load Matrix failed because " + err);
+			VG.DetectError("Load Matrix Mode failed");
 			VG.vgDrawImage(handle);
-			if ((err = VG.vgGetError()) != ErrorCode.NoError)
-				throw new Exception("Draw image failed because " + err);
+			VG.DetectError("Draw Image failed");
 			draws++;
 		}
 
