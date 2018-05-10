@@ -33,9 +33,6 @@ namespace PiGameSharp.Dispmanx
 		public uint DisplayNumber;
 
 		// This makes debugging less cumbersome
-		public override string ToString()
-		{
-			return "Display Device 0x" + DisplayNumber.ToString("X") + " [" + Size + "] transform " + Transformation + " format " + Format;
-		}
+		public override string ToString() => "Display Device 0x" + DisplayNumber.ToString("X") + " [" + Size + "] transform " + Transformation + " format " + Format;
 	}
 }

@@ -150,18 +150,12 @@ namespace PiGameSharp.VG
 		/// Projects this vector onto another
 		/// </summary>
 		/// <param name="to">The vector to project to</param>
-		public Vector3 Project(Vector3 to)
-		{
-			return to * ((this * to) / to.LengthSq);
-		}
+		public Vector3 Project(Vector3 to) => to * ((this * to) / to.LengthSq);
 
 		/// <summary>
 		/// Scales this vector such that it's magnitude becomes 1.0
 		/// </summary>
-		public Vector3 Normalize()
-		{
-			return this * (1.0f/Length);
-		}
+		public Vector3 Normalize() => this * (1.0f / Length);
 
 		/// <summary>
 		/// Gets the square of the length (or magnitude) of this vector
@@ -187,9 +181,6 @@ namespace PiGameSharp.VG
 			}
 		}
 
-		public override string ToString()
-		{
-			return "[" + x + ", " + y + ", " + z + "]";
-		}
+		public override string ToString() => "[" + x + ", " + y + ", " + z + "]";
 	}
 }

@@ -36,7 +36,7 @@ namespace PiGameSharp.Dispmanx
 		/// <summary>
 		/// Initializes the dispmanx features of the host.
 		/// </summary>
-		public static void Init()
+		internal static void Init()
 		{
 			// Has the BcmHost been initialized already?
 			if (Devices != null)
@@ -70,7 +70,7 @@ namespace PiGameSharp.Dispmanx
 		/// <summary>
 		/// Releases all dispmanx resources (devices/updates) held by this process.
 		/// </summary>
-		public static void Deinit()
+		internal static void Deinit()
 		{
 			// Has the BcmHost never been initialized or already deinitialized?
 			if (Devices == null)

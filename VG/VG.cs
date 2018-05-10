@@ -149,10 +149,7 @@ namespace PiGameSharp.VG
 		}
 
 		[Conditional("DEBUG")]
-		public static void DumpContext()
-		{
-			DumpContext(null);
-		}
+		public static void DumpContext() => DumpContext(null);
 
 		[Conditional("DEBUG")]
 		internal static void DumpContext(Handle h)

@@ -20,18 +20,12 @@ namespace PiGameSharp
 		/// <summary>
 		/// Starts periodic sampling of all performance counters
 		/// </summary>
-		public static void StartStatsSampling()
-		{
-			active = true;
-		}
+		public static void StartStatsSampling() => active = true;
 
 		/// <summary>
 		/// Stops periodic sampling of all performance counters
 		/// </summary>
-		public static void StopStatsSampling()
-		{
-			active = false;
-		}
+		public static void StopStatsSampling() => active = false;
 
 		private static void PrintCounters(object state)
 		{
@@ -202,28 +196,6 @@ namespace PiGameSharp
 			if (that == null)
 				return 1;
 			return this.NextSample.CompareTo(that.NextSample);
-		}
-
-		/// <summary>
-		/// Increment a performance counter.
-		/// </summary>
-		/// <param name="item">The performance counter to increment</param>
-		/// <returns>The performance counter</returns>
-		public static PerformanceCounter operator ++(PerformanceCounter item)
-		{
-			item.Add(1.0);
-			return item;
-		}
-
-		/// <summary>
-		/// Decrement a performance counter.
-		/// </summary>
-		/// <param name="item">The performance counter to decrement</param>
-		/// <returns>The performance counter</returns>
-		public static PerformanceCounter operator --(PerformanceCounter item)
-		{
-			item.Add(-1.0);
-			return item;
 		}
 
 		/// <summary>

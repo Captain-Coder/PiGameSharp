@@ -34,7 +34,7 @@ namespace PiGameSharp.EGL
 		/// <summary>
 		/// Performance counter to measure framerate
 		/// </summary>
-		public static PerformanceCounter frames = new PerformanceCounter("EGL.Swap()")
+		public readonly static PerformanceCounter frames = new PerformanceCounter("EGL.Swap()")
 			{
 				Unit = "Frames",
 				SampleInterval = TimeSpan.FromSeconds(10)
@@ -45,7 +45,7 @@ namespace PiGameSharp.EGL
 		/// </summary>
 		/// <param name="hwnd">The Window handle to initialize EGL on</param>
 		/// <param name="bind">The EGL API to bind the current thread to</param>
-		public static void InitWin32(IntPtr hwnd, EglApi bind)
+		internal static void InitWin32(IntPtr hwnd, EglApi bind)
 		{
 			extrahandle = new Handle("Windows Device Context", GetDC(hwnd), delegate(IntPtr h)
 			{
@@ -59,13 +59,13 @@ namespace PiGameSharp.EGL
 		/// </summary>
 		/// <param name="device">The Dispmanx DisplayDevice to initialize EGL on</param>
 		/// <param name="bind">The EGL API to bind the current thread to</param>
-		public static void InitDispmanx(DisplayDevice device, EglApi bind)
+		internal static void InitDispmanx(DisplayDevice device, EglApi bind)
 		{
 			// Important stuff! https://www.raspberrypi.org/forums/viewtopic.php?f=68&t=30261 (halleluya for this guy catching this! Would have taken me a while...)
 			// Apparently the expectation of EGL is that window objects stay in place. Well that might be true for C/C++/X11/Win32 but it certainly isn't in .net world.
 			// So we have to ensure we never move the struct we are gonna give to eglCreateWindowSurface, otherwise you get mayhem and madness! (belive me I checked).
 			// Two options are, using a GCHandle with pinned type, or Marshal heap allocation. Where the latter is designed for this situation, and GCHandle involves
-			// dealing with valuetype boxing effects.
+			// dealing with valuetype boxing nastyness.
 			extrahandle = new Handle("EGL Native Window", Marshal.AllocHGlobal(Marshal.SizeOf(typeof(EglDispmanxWindow))), Marshal.FreeHGlobal);
 			Marshal.StructureToPtr(new EglDispmanxWindow() { dispmanx_element = device.Element, size = device.Mode.Size }, extrahandle, false);
 			Init(extrahandle, IntPtr.Zero, bind);
@@ -77,8 +77,9 @@ namespace PiGameSharp.EGL
 		/// Initialize EGL on an X11 window
 		/// </summary>
 		/// <param name="bind">The EGL API to bind the current thread to</param>
-		public static void InitX11(EglApi bind)
+		internal static void InitX11(EglApi bind)
 		{
+			//TODO: x11 init
 		}
 
 		private static void Init(IntPtr hwnd, IntPtr hdc, EglApi bind)
@@ -138,7 +139,7 @@ namespace PiGameSharp.EGL
 		/// <summary>
 		/// Deinitialize EGL and release all resources
 		/// </summary>
-		public static void Deinit()
+		internal static void Deinit()
 		{
 			if (display == null || display == IntPtr.Zero)
 				return;
@@ -158,7 +159,7 @@ namespace PiGameSharp.EGL
 
 		internal static void Swap()
 		{
-			frames++;
+			frames.Add(1.0);
 			if (!eglSwapBuffers(display, windowsurface))
 				throw new Exception("Unable to swap buffers " + eglGetError());
 		}

@@ -21,12 +21,14 @@ namespace PiGameSharp
 				WindowsInit(target);
 			else if (Environment.OSVersion.Platform == PlatformID.Unix)
 			{
-				string hw = File.ReadAllText("/proc/cpuinfo");
-				if (hw.Contains("BCM2708") || hw.Contains("BCM2709"))
+				string hw = File.ReadAllText("/proc/cpuinfo").ToLower();
+				if (hw.Contains("bcm2708") || hw.Contains("bcm2709") || hw.Contains("bcm2837") || hw.Contains("bcm2836") ||  hw.Contains("bcm2835"))
 					PiInit();
 				else
 					LinuxInit();
 			}
+
+			Input.Init();
 		}
 
 		/// <summary>
@@ -37,6 +39,8 @@ namespace PiGameSharp
 			PiGameSharp.EGL.EGL.Deinit();
 			if (deinit != null)
 				deinit();
+
+			Input.Deinit();
 		}
 
 		private static void WindowsInit(object target)
@@ -52,25 +56,28 @@ namespace PiGameSharp
 			deinit = PiDeinit;
 
 			BcmHost.Init();
-			Console.WriteLine("After init");
 			if (BcmHost.Devices == null || BcmHost.Devices.Count < 0)
 				throw new Exception("No dispmanx display available");
 			PiGameSharp.EGL.EGL.InitDispmanx(BcmHost.Devices[0], EglApi.OpenVG);
+
+			PiGameSharp.Sound.ALSA.Init();
 		}
 
 		private static void PiDeinit()
 		{
+			PiGameSharp.Sound.ALSA.Deinit();
 			BcmHost.Deinit();
 		}
 
 		private static void LinuxInit()
 		{
+			PiGameSharp.Sound.ALSA.Init();
 			deinit = LinuxDeinit;
 		}
 
 		private static void LinuxDeinit()
 		{
-
+			PiGameSharp.Sound.ALSA.Deinit();
 		}
 	}
 }

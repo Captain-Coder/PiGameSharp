@@ -43,10 +43,7 @@ namespace PiGameSharp
 			this.y = y;
 		}
 
-		public override string ToString()
-		{
-			return "[" + x + ", " + y + "]";
-		}
+		public override string ToString() => "[" + x + ", " + y + "]";
 
 		/// <summary>
 		/// Shift left all elements of a vector

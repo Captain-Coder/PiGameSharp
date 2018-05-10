@@ -38,30 +38,21 @@ namespace PiGameSharp.VG
 		/// </summary>
 		/// <returns><c>true</c> if the format supports component color; otherwise, <c>false</c>.</returns>
 		/// <param name="fmt">The format to test</param>
-		public static bool HasComponentColor(this ImageFormat fmt)
-		{
-			return (uint)(fmt & ImageFormat.FormatMask) < 9 && (fmt & ImageFormat.FormatMask) != ImageFormat.Grayscale8;
-		}
+		public static bool HasComponentColor(this ImageFormat fmt) => (uint)(fmt & ImageFormat.FormatMask) < 9 && (fmt & ImageFormat.FormatMask) != ImageFormat.Grayscale8;
 
 		/// <summary>
 		/// Determines if the color format contains an alpha component
 		/// </summary>
 		/// <returns><c>true</c> if the format has an alpha component; otherwise, <c>false</c>.</returns>
 		/// <param name="fmt">The format to test</param>
-		public static bool HasAlpha(this ImageFormat fmt)
-		{
-			return (uint)(fmt & ImageFormat.FormatMask) < 10 && fmt != ImageFormat.Rgb565 && fmt != ImageFormat.Grayscale8 || fmt == ImageFormat.AlphaOnly1 || fmt == ImageFormat.AlphaOnly4 || fmt == ImageFormat.AlphaOnly8;
-		}
+		public static bool HasAlpha(this ImageFormat fmt) => (uint)(fmt & ImageFormat.FormatMask) < 10 && fmt != ImageFormat.Rgb565 && fmt != ImageFormat.Grayscale8 || fmt == ImageFormat.AlphaOnly1 || fmt == ImageFormat.AlphaOnly4 || fmt == ImageFormat.AlphaOnly8;
 
 		/// <summary>
 		/// Determines if specified format is valid
 		/// </summary>
 		/// <returns><c>true</c> if the format is valid; otherwise, <c>false</c>.</returns>
 		/// <param name="fmt">The format to test</param>
-		public static bool IsValid(this ImageFormat fmt)
-		{
-			return ((fmt & ImageFormat.ColorOrderBgr) != ImageFormat.ColorOrderBgr || !fmt.HasComponentColor()) && ((fmt & ImageFormat.AlphaFirst) != ImageFormat.AlphaFirst || !fmt.HasComponentColor() || !fmt.HasAlpha());
-		}
+		public static bool IsValid(this ImageFormat fmt) => ((fmt & ImageFormat.ColorOrderBgr) != ImageFormat.ColorOrderBgr || !fmt.HasComponentColor()) && ((fmt & ImageFormat.AlphaFirst) != ImageFormat.AlphaFirst || !fmt.HasComponentColor() || !fmt.HasAlpha());
 
 		/// <summary>
 		/// Determines the number of bits every sample needs in the specified format

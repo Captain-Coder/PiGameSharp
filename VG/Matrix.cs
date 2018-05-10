@@ -160,19 +160,13 @@ namespace PiGameSharp.VG
 		/// Creates an transformation matrix which translates the point of origin
 		/// </summary>
 		/// <param name="v">Vector specifying the translation to apply</param>
-		public static Matrix Translation(Vector3 v)
-		{
-			return new Matrix(Vector3.UnitX, Vector3.UnitY, new Vector3(v.x, v.y, 1.0f));
-		}
+		public static Matrix Translation(Vector3 v) => new Matrix(Vector3.UnitX, Vector3.UnitY, new Vector3(v.x, v.y, 1.0f));
 
 		/// <summary>
 		/// Creates an transformation matrix which scales around the point of origin
 		/// </summary>
 		/// <param name="factor">Scalar value indicating the scaling to apply</param>
-		public static Matrix Scale(float factor)
-		{
-			return new Matrix(Vector3.UnitX * factor, Vector3.UnitY * factor, Vector3.UnitZ);
-		}
+		public static Matrix Scale(float factor) => new Matrix(Vector3.UnitX * factor, Vector3.UnitY * factor, Vector3.UnitZ);
 
 		/// <summary>
 		/// Creates an transformation matrix which rotates around the point of origin
@@ -207,9 +201,6 @@ namespace PiGameSharp.VG
 				new Vector3(x.z, y.z, z.z));
 		}
 
-		public override string ToString()
-		{
-			return "[" + x + ", " + y + ", " + z + "]";
-		}
+		public override string ToString() => "[" + x + ", " + y + ", " + z + "]";
 	}
 }

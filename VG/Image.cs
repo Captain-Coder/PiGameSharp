@@ -94,7 +94,7 @@ namespace PiGameSharp.VG
 			VG.DetectError("Load Matrix Mode failed");
 			VG.vgDrawImage(handle);
 			VG.DetectError("Draw Image failed");
-			draws++;
+			draws.Add(1.0);
 		}
 
 		/// <summary>
