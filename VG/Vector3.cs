@@ -48,7 +48,7 @@ namespace PiGameSharp.VG
 		/// </summary>
 		/// <param name="x">The x coordinate</param>
 		/// <param name="y">The y coordinate</param>
-		public Vector3(float x, float y) : this (x, y, 1.0f)
+		public Vector3(float x, float y) : this (x, y, 0)
 		{
 		}
 

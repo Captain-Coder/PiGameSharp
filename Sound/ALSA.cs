@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 
 namespace PiGameSharp.Sound
 {
-	public static class ALSA
+	internal static class ALSA
 	{
 		[DllImport("libasound")] static extern int snd_pcm_open (ref IntPtr handle, string pcm_name, int stream, int mode); 
 		[DllImport("libasound")] static extern int snd_pcm_close (IntPtr handle); 
@@ -38,7 +37,6 @@ namespace PiGameSharp.Sound
 		private static int channels;
 		private static int framelength;
 		private static int periodlength;
-		private static Dictionary<string, float[]> cache = new Dictionary<string, float[]>();
 
 		/// <summary>
 		/// Performance counter to measure alsa write speed
@@ -48,8 +46,6 @@ namespace PiGameSharp.Sound
 			Unit = "Samples",
 			SampleInterval = TimeSpan.FromSeconds(10)
 		};
-
-
 
 		private static string snd_strerror(int err)
 		{
@@ -176,52 +172,35 @@ namespace PiGameSharp.Sound
 						if ((err = snd_pcm_prepare(h)) < 0)
 							throw new Exception("Unable to prepare device after underrun " + snd_strerror(err));
 					}
-					else if (samples == -77)
+					else if (samples == -77) //EBADFD when the sound device is closed
 						break;
 					else if (samples < 0)
 						throw new Exception("Unable to write frame " + snd_strerror(samples));
 					else
 						sample_counter.Add(samples);
 				}
-				Thread.Sleep(10);  //This is a cheap, workable solution but not ideal. Revisit this with later resource abstraction refactoring. Mixing could happen in this loop?
+				// Without this wait, the sample writer gets starved for lock(h). (Since playback thread is high prio.) And playing a sound can be delayed for 10's of seconds.
+				Thread.Sleep(10);  //TODO: This is a cheap, workable solution but not ideal. Revisit this with later resource abstraction refactoring. Mixing could happen in this loop?
 			}
 		}
 
-		public static void Play(string sound)
+		internal static void Play(PCM item)
 		{
-			if (!cache.ContainsKey(sound))
-				return;
-
-			float[] s = cache[sound];
 			Handle h = device_handle;
 			if (h == null)
 				return;
-			DateTime before = DateTime.Now;
 			lock (h)
 			{
-				Console.WriteLine("Lock took: " + (DateTime.Now - before) + " seconds");
 				if (sfx_buffer == null)
 					sfx_buffer = new List<float>();
-				for (int i = 0; i < s.Length; i++)
+				for (int i = 0; i < item.samples.Length; i++)
 				{
 					if (sfx_buffer.Count <= i)
-						sfx_buffer.Add(s[i]);
+						sfx_buffer.Add(item.samples[i]);
 					else
-						sfx_buffer[i] += s[i];
+						sfx_buffer[i] += item.samples[i];
 				}
 			}
-		}
-
-		public static void LoadSound(string sound, Stream data)
-		{
-			if (cache.ContainsKey(sound))
-				return;
-
-			BinaryReader br = new BinaryReader(data);
-			float[] buffer = new float[data.Length / sizeof(short)];
-			for (int i = 0; i < buffer.Length; i++)
-				buffer[i] = (float)br.ReadInt16() / (float)Int16.MaxValue;
-			cache[sound] = buffer;
 		}
 
 		internal static void Deinit()

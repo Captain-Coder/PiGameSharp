@@ -24,7 +24,34 @@ lib that would let me build the this year's game and get me in a good position
 for next year. After dealing with DispManX, EGL and OpenVG I thought I might
 aswell include evdev input and Alsa audio for a neat package.
 
+This project can use two OpenVG implementations: 
+- the Khronos Reference Implementation of OpenVG or
+- the Broadcom OpenVG implementation on the Raspbery Pi.
+Needless to say, the reference implementation (RI) is a slow software render,
+but it works good enough to use on my development machine.
 
-This lib is made to use the Khronos Reference Implementation of OpenVG or the
-Broadcom OpenVG implementation on the Raspbery Pi. The RI gives a slow software
-render on a development platform.
+2018 update
+===========
+I worked on fixing the bugs left over from last year. The 2017 game is a simple
+maze where you can collect fruit. This had a lot of code that could be
+repurposed for the 2018 game. This is ofcourse the mark of code that should be
+in a library somewhere. So I refactored the 2017 game and moved the
+repurposable items to PiGameSharp. This was so successfull that the entire game
+of 2017 now consists of only 3 classes for a total of 260 LOC including all
+boilerplate, argument handling and maze layout definitions.
+
+New additions to the library are:
+- TileWorld, defines a game world consisting of square tiles. On which game 
+entities can be freely positioned. The entities can interact with the tiles in
+the world to create many effects. The object model should be flexible enough to
+also describe other world geometries than orthogonal projection, such as
+isometric, hexagonal or others. The code for this is definately not done yet :)
+- Abstracted loadable resources. It just seemd like a good thing to do.
+- Automated resource loader. Traverses the loaded assemblies and loads any
+embedded resources from them.
+- Resource cache. A cache structure that can automate unloading of infreqently
+used resources. Currently it's not embedded very well in the resource use
+cycle, just in the loading bit. So this will need future development to make
+full use of it.
+- Audio now also plays on Windows through some PlaySound magic
+- VG Path. Limited initial work on exposing OpenVG Paths.

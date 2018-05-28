@@ -37,6 +37,9 @@
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Cache.cs" />
+    <Compile Include="Resource.cs" />
+    <Compile Include="ResourceLibrary.cs" />
     <Compile Include="Sound\ALSA.cs" />
     <Compile Include="Handle.cs" />
     <Compile Include="Dispmanx\DisplayDevice.cs" />
@@ -52,6 +55,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rect.cs" />
     <Compile Include="Dispmanx\Transform.cs" />
+    <Compile Include="Sound\PCM.cs" />
+    <Compile Include="Sound\Windows.cs" />
+    <Compile Include="TileWorld\Direction.cs" />
+    <Compile Include="TileWorld\Entity.cs" />
+    <Compile Include="TileWorld\EntityType.cs" />
+    <Compile Include="TileWorld\Interaction.cs" />
+    <Compile Include="TileWorld\Tile.cs" />
+    <Compile Include="TileWorld\TileSet.cs" />
+    <Compile Include="TileWorld\TileShape.cs" />
+    <Compile Include="TileWorld\World.cs" />
     <Compile Include="Vector2.cs" />
     <Compile Include="VG\BlendMode.cs" />
     <Compile Include="VG\ErrorCode.cs" />
@@ -62,6 +75,7 @@
     <Compile Include="VG\MatrixMode.cs" />
     <Compile Include="VG\Parameter.cs" />
     <Compile Include="VG\ParameterInfoAttribute.cs" />
+    <Compile Include="VG\Path.cs" />
     <Compile Include="VG\Vector3.cs" />
     <Compile Include="VG\VG.cs" />
     <Compile Include="Platform.cs" />

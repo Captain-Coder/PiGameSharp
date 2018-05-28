@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace PiGameSharp.VG
 {
@@ -11,18 +12,14 @@ namespace PiGameSharp.VG
 		private RenderNode par;
 		private List<RenderNode> children;
 		private Matrix transf = Matrix.Identity;
-		private Matrix worldtransf = Matrix.Identity;
-		
+
 		/// <summary>
 		/// Gets or sets the parent of this node
 		/// </summary>
 		/// <value>The parent</value>
 		public RenderNode Parent
 		{
-			get
-			{
-				return par;
-			}
+			get => par;
 			set
 			{
 				if (par != null)
@@ -47,17 +44,14 @@ namespace PiGameSharp.VG
 				UpdateTransformation();
 			}
 		}
-		
+
 		/// <summary>
 		/// Gets or sets the transformation of this node relative to its parent node, or the world if this node has no parent.
 		/// </summary>
 		/// <value>The transformation</value>
 		public Matrix Transform
 		{
-			get
-			{
-				return transf;
-			}
+			get => transf;
 			set
 			{
 				transf = value;
@@ -69,13 +63,7 @@ namespace PiGameSharp.VG
 		/// Gets the world transformation of this node. That is, the transformation of all parents and this node expressed as a transformation.
 		/// </summary>
 		/// <value>The world transform.</value>
-		public Matrix WorldTransform
-		{
-			get
-			{
-				return this.worldtransf;
-			}
-		}
+		public Matrix WorldTransform { get; private set; } = Matrix.Identity;
 
 		/// <summary>
 		/// Gets and enumerable for the ancestors of this node
@@ -122,12 +110,26 @@ namespace PiGameSharp.VG
 					rg.Draw();
 		}
 
+		/// <summary>
+		/// Draw the debug display of this render node and its children
+		/// </summary>
+		[Conditional("DEBUG")]
+		public virtual void DrawDebug()
+		{
+			if (children != null)
+				foreach (RenderNode rg in children)
+					rg.DrawDebug();
+		}
+
+
+		public RenderNode this[int child] => children[child];
+
 		private void UpdateTransformation()
 		{
 			if (par != null)
-				worldtransf = par.worldtransf * this.transf;
+				WorldTransform = par.WorldTransform * transf;
 			else
-				worldtransf = this.transf;
+				WorldTransform = transf;
 			if (children != null)
 				foreach (RenderNode rg in children)
 					rg.UpdateTransformation();

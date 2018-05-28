@@ -19,6 +19,7 @@ namespace PiGameSharp
 		internal static void Init()
 		{
 			if (Directory.Exists("/dev/input"))
+				//TODO: observe /dev/input for future devices (i.e.: reconnected bluetooth device and such)
 				foreach (string f in Directory.GetFiles("/dev/input", "event*", SearchOption.TopDirectoryOnly))
 					OpenStream(f);
 

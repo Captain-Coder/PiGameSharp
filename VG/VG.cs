@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
-using System.Reflection;
 using System.Diagnostics;
 
 namespace PiGameSharp.VG
@@ -39,6 +36,10 @@ namespace PiGameSharp.VG
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgImageSubData(IntPtr image, byte[] data, int dataStride, ImageFormat dataFormat, uint x, uint y, uint width, uint height);
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgDrawImage(IntPtr image);
 		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgDestroyImage(IntPtr image);
+		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] internal static extern IntPtr vgCreatePath(int pathFormat /*0*/, int datatype /*float = 3*/, float scale /*1*/, float bias /*0*/, int segCapacityHint /*0*/, int coordCapacityHint /*0*/, int capabilities);
+		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgAppendPathData(IntPtr path, int numSegments, byte[] pathSegments, float[] pathData);
+		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgDrawPath(IntPtr path);
+		[DllImport("libOpenVG.dll", CallingConvention=CallingConvention.Cdecl)] internal static extern void vgDestroyPath(IntPtr path);
 
 		public static int MaxImageWidth
 		{
@@ -129,6 +130,42 @@ namespace PiGameSharp.VG
 
 		public static Vector2 RenderSize { get; set; }
 
+		public static Matrix ImageToSurfaceTransform
+		{
+			set
+			{
+				vgLoadMatrix(ref value);
+				DetectError("Load Matrix");
+			}
+		}
+
+		public static Matrix PathToSurfaceTransform
+		{
+			set
+			{
+				vgSet(Parameter.MATRIX_MODE, (int)MatrixMode.PathUserToSurface);
+				DetectError("Set Matrix Mode failed");
+				vgLoadMatrix(ref value);
+				DetectError("Load Matrix");
+				vgSet(Parameter.MATRIX_MODE, (int)MatrixMode.ImageUserToSurface);
+				DetectError("Set Matrix Mode back failed");
+			}
+		}
+
+		public static Matrix GlyphToSurfaceTransform
+		{
+			set
+			{
+				vgSet(Parameter.MATRIX_MODE, (int)MatrixMode.GlyphUserToSurface);
+				DetectError("Set Matrix Mode failed");
+				vgLoadMatrix(ref value);
+				DetectError("Load Matrix");
+				vgSet(Parameter.MATRIX_MODE, (int)MatrixMode.ImageUserToSurface);
+				DetectError("Set Matrix Mode back failed");
+			}
+		}
+
+
 		[MethodImpl(MethodImplOptions.NoInlining)]
 		public static void Show()
 		{
@@ -146,6 +183,8 @@ namespace PiGameSharp.VG
 			DetectError("Error setting clear color");
 			vgClear(0, 0, (int)RenderSize.x, (int)RenderSize.y);
 			DetectError("Error clearing");
+			vgSet(Parameter.MATRIX_MODE, (int)MatrixMode.ImageUserToSurface);
+			DetectError("Error setting default matrix mode");
 		}
 
 		[Conditional("DEBUG")]

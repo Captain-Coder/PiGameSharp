@@ -49,6 +49,7 @@ namespace PiGameSharp
 				throw new ArgumentException("Windows init expects a window handle IntPtr");
 
 			PiGameSharp.EGL.EGL.InitWin32((IntPtr)target, EglApi.OpenVG);
+			PiGameSharp.Sound.PCM.play = PiGameSharp.Sound.Windows.Play;
 		}
 
 		private static void PiInit()
@@ -61,6 +62,7 @@ namespace PiGameSharp
 			PiGameSharp.EGL.EGL.InitDispmanx(BcmHost.Devices[0], EglApi.OpenVG);
 
 			PiGameSharp.Sound.ALSA.Init();
+			PiGameSharp.Sound.PCM.play = PiGameSharp.Sound.ALSA.Play;
 		}
 
 		private static void PiDeinit()
@@ -71,8 +73,11 @@ namespace PiGameSharp
 
 		private static void LinuxInit()
 		{
-			PiGameSharp.Sound.ALSA.Init();
 			deinit = LinuxDeinit;
+			//TODO: egl+vg init on linux
+
+			PiGameSharp.Sound.ALSA.Init();
+			PiGameSharp.Sound.PCM.play = PiGameSharp.Sound.ALSA.Play;
 		}
 
 		private static void LinuxDeinit()
