@@ -29,6 +29,8 @@ namespace PiGameSharp
 			}
 
 			Input.Init();
+
+			PerformanceCounter.StartStatsSampling();
 		}
 
 		/// <summary>
@@ -36,6 +38,10 @@ namespace PiGameSharp
 		/// </summary>
 		public static void Deinit()
 		{
+			PerformanceCounter.StopStatsSampling();
+
+			ResourceLibrary.Dispose();
+
 			PiGameSharp.EGL.EGL.Deinit();
 			if (deinit != null)
 				deinit();

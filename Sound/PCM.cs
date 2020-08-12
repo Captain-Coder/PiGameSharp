@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 
 namespace PiGameSharp.Sound
 {
@@ -7,10 +7,10 @@ namespace PiGameSharp.Sound
 	{
 		internal static Action<PCM> play;
 
-		private Func<Stream> source;
 		internal float[] samples;
+		private object source;
 
-		public PCM(Func<Stream> datasource) => source = datasource ?? throw new ArgumentNullException("datasource");
+		public PCM(Dictionary<string, string> arguments) { }
 
 		/// <summary>
 		/// Play this PCM sound
@@ -31,13 +31,16 @@ namespace PiGameSharp.Sound
 			if (samples != null)
 				return;
 
-			using (Stream data = source())
+			if (DataSource == null)
 			{
-				BinaryReader br = new BinaryReader(data);
-				samples = new float[data.Length / sizeof(short)];
-				for (int i = 0; i < samples.Length; i++)
-					samples[i] = (float)br.ReadInt16() / (float)short.MaxValue;
+				Console.Error.WriteLine("Unable to load sound with no datasource");
+				return;
 			}
+
+			byte[] data = DataSource();
+			samples = new float[data.Length / sizeof(short)];
+			for (int i = 0; i < samples.Length; i++)
+				samples[i] = (float)BitConverter.ToInt16(data, i * sizeof(short)) / (float)short.MaxValue;
 		}
 
 		protected override void Unload() => samples = null;

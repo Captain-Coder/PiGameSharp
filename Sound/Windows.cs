@@ -5,12 +5,6 @@ namespace PiGameSharp.Sound
 {
 	internal static class Windows
 	{
-		/*		[DllImport("Winmm.dll")] private static extern bool PlaySoundW(byte[] wav_sound, IntPtr module, int flags);
-				NODEFAULT = 0x0002,
-				MEMORY = 0x0004,
-				NOSTOP = 0x0010,
-				}*/
-
 		internal static void Play(PCM item)
 		{
 			int datalength = item.samples.Length * sizeof(short);

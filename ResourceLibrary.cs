@@ -2,16 +2,26 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using PiGameSharp.Sound;
-using PiGameSharp.VG;
 
 namespace PiGameSharp
 {
 	public static class ResourceLibrary
 	{
+		static ResourceLibrary()
+		{
+			ResourceFactory.Register(typeof(ResourceLibrary).Assembly);
+
+			AppDomain.CurrentDomain.AssemblyLoad += delegate (object sender, AssemblyLoadEventArgs e) { ResourceFactory.Register(e.LoadedAssembly);  Register(e.LoadedAssembly); };
+			foreach (Assembly a in AppDomain.CurrentDomain.GetAssemblies())
+			{
+				ResourceFactory.Register(a);
+				Register(a);
+			}
+		}
+
 		private static List<Resource> resources = new List<Resource>();
 		private static Cache cache = new Cache();
-		private static Dictionary<string, int> key_map = new Dictionary<string, int>();
+		private static Dictionary<string, int> keymap = new Dictionary<string, int>();
 
 		public static Resource Get(int key)
 		{
@@ -24,7 +34,7 @@ namespace PiGameSharp
 			}
 			return ret;
 		}
-		public static Resource Get(string name) => key_map.ContainsKey(name) ? Get(key_map[name]) : null;
+		public static Resource Get(string name) => keymap.ContainsKey(name) ? Get(keymap[name]) : null;
 
 		public static void Register(Resource item)
 		{
@@ -35,36 +45,36 @@ namespace PiGameSharp
 
 		public static void Register(Assembly target)
 		{
+			ResourceFactory.Register(target);
 			foreach (string name in target.GetManifestResourceNames())
 			{
 				Resource r = null;
-				if (name.EndsWith(".raw"))
+				Dictionary<string, string> arguments = new Dictionary<string, string>();
+				string[] args = name.Split('_');
+				string key = args[0];
+				for (int i = 1; i < args.Length; i++)
+					if (args[i].Contains("="))
+						arguments[args[i].Substring(0, args[i].IndexOf("="))] = args[i].Substring(args[i].IndexOf("=") + 1);
+					else
+						arguments[args[i]] = "on";
+
+				r = ResourceFactory.Construct(arguments);
+				if (r != null)
 				{
-					Func<Stream> datasource = delegate
-					{
-						return target.GetManifestResourceStream(name);
-					};
-					r = new PCM(datasource);
-				}
-				else if (name.EndsWith(".bin"))
-				{
-					string size = System.IO.Path.GetFileNameWithoutExtension(name).Substring(name.LastIndexOf("_") + 1);
-					Func<byte[]> datasource = delegate
+					key = key + "." + arguments["type"];
+					if (keymap.ContainsKey(key))
+						continue;
+					r.DataSource = delegate
 					{
 						byte[] data;
-						using(Stream s = target.GetManifestResourceStream(name))
+						using (Stream s = target.GetManifestResourceStream(name))
 						{
 							data = new byte[s.Length];
 							s.Read(data, 0, data.Length);
 						}
 						return data;
 					};
-					r = new Image(ImageFormat.Rgba8888, new Vector2(uint.Parse(size.Substring(0, size.IndexOf("x"))), uint.Parse(size.Substring(size.IndexOf("x") + 1))), datasource);
-				}
-
-				if (r != null)
-				{
-					key_map[System.IO.Path.GetFileNameWithoutExtension(name)] = r.Key;
+					keymap[key] = r.Key;
 					Register(r);
 				}
 			}
@@ -74,7 +84,7 @@ namespace PiGameSharp
 		{
 			cache.Flush();
 			resources.Clear();
-			key_map.Clear();
+			keymap.Clear();
 		}
 	}
 }

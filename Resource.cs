@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 
 namespace PiGameSharp
 {
@@ -12,6 +13,8 @@ namespace PiGameSharp
 		protected readonly object sync_key = new object();
 
 		protected Resource() => Key = Interlocked.Increment(ref ResourceId);
+
+		public Func<byte[]> DataSource;
 
 		/// <summary>
 		/// The unique resource identifier for this resource

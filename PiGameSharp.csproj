@@ -39,6 +39,7 @@
   <ItemGroup>
     <Compile Include="Cache.cs" />
     <Compile Include="Resource.cs" />
+    <Compile Include="ResourceFactory.cs" />
     <Compile Include="ResourceLibrary.cs" />
     <Compile Include="Sound\ALSA.cs" />
     <Compile Include="Handle.cs" />

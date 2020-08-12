@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using PiGameSharp.VG;
 
 namespace PiGameSharp.TileWorld
@@ -7,11 +6,16 @@ namespace PiGameSharp.TileWorld
 	public class Entity : RenderNode
 	{
 		public Image Image;
+#if DEBUG
+		public Image ImageCover;
+#endif
+
 		public EntityType EntityType;
 
 		public World World => (World)Parent;
-		public float WidthInTiles => Image != null ? Image.Size.x / (float)World.Tiles.UnitSize.x : 1;
-		public float HeightInTiles => Image != null ? Image.Size.y / (float)World.Tiles.UnitSize.y : 1;
+		public Vector2 Size => Image != null ? Image.Size : World.Tiles.UnitSize;
+		public float WidthInTiles => Size.x / (float)World.Tiles.UnitSize.x;
+		public float HeightInTiles => Size.y / (float)World.Tiles.UnitSize.y;
 
 		public Vector3 Position => Transform.z + new Vector3(WidthInTiles / 2, HeightInTiles / 2);
 
@@ -23,6 +27,18 @@ namespace PiGameSharp.TileWorld
 				Image.Draw();
 			}
 			base.Draw();
+		}
+
+		public override void DrawDebug()
+		{
+			base.DrawDebug();
+			if (ImageCover == null)
+				return;
+			foreach (Vector2 pos in DetermineCover(Position))
+			{
+				VG.VG.ImageToSurfaceTransform = Parent.WorldTransform * World.GetTileTransform(pos);
+				ImageCover.Draw();
+			}
 		}
 
 		public void Move(Vector3 delta)

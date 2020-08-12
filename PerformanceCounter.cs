@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 
 namespace PiGameSharp
@@ -20,11 +21,13 @@ namespace PiGameSharp
 		/// <summary>
 		/// Starts periodic sampling of all performance counters
 		/// </summary>
+		[Conditional("DEBUG")]
 		public static void StartStatsSampling() => active = true;
 
 		/// <summary>
 		/// Stops periodic sampling of all performance counters
 		/// </summary>
+		[Conditional("DEBUG")]
 		public static void StopStatsSampling() => active = false;
 
 		private static void PrintCounters(object state)

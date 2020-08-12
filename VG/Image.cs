@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace PiGameSharp.VG
@@ -18,7 +19,17 @@ namespace PiGameSharp.VG
 		};
 
 		private Handle handle;
-		private Func<byte[]> source;
+
+		internal Image(Dictionary<string, string> arguments)
+		{
+			if (arguments.ContainsKey("format"))
+				Format = (ImageFormat)Enum.Parse(typeof(ImageFormat), arguments["format"]);
+			else
+				Format = ImageFormat.Rgba8888;
+			if (!arguments.ContainsKey("size"))
+				arguments["size"] = "0x0";
+			Size = new Vector2(uint.Parse(arguments["size"].Substring(0, arguments["size"].IndexOf("x"))), uint.Parse(arguments["size"].Substring(arguments["size"].IndexOf("x") + 1)));
+		}
 
 		/// <summary>
 		/// Initializes a new <see cref="PiGameSharp.VG.Image"/> with format, size and optinally data
@@ -26,11 +37,10 @@ namespace PiGameSharp.VG
 		/// <param name="format">The pixel format to use for this image</param>
 		/// <param name="size">The size of the image</param>
 		/// <param name="datasource">A delegate that produces image data and a scanlinestride, or null to keep the image unfilled</param>
-		public Image(ImageFormat format, Vector2 size, Func<byte[]> datasource)
+		public Image(ImageFormat format, Vector2 size)
 		{
 			Size = size;
 			Format = format;
-			source = datasource;
 		}
 
 		/// <summary>
@@ -58,9 +68,9 @@ namespace PiGameSharp.VG
 				VG.vgDestroyImage(h);
 			});
 
-			if (source != null)
+			if (DataSource != null)
 			{
-				byte[] data = source();
+				byte[] data = DataSource();
 				SetImageData(data, data.Length /  (int)Size.y, new Rect(Vector2.Zero, Size));
 			}
 		}
